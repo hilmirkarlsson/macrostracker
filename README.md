@@ -3,6 +3,8 @@
 A local-first food diary and macro tracker. No build step, no backend, no account —
 just static files and `localStorage`.
 
+Live at: https://hilmirkarlsson.github.io/macrostracker/
+
 ## Run it
 
 Serve the folder over HTTP (ES modules and service workers don't work from `file://`):
