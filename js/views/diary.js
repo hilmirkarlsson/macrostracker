@@ -54,7 +54,7 @@ function mealCard(dateKeyStr, mealKey, mealLabel, entries) {
     list.append(el('div', { class: 'empty-state' }, 'Nothing logged yet.'));
   } else {
     for (const entry of entries) {
-      const m = scaleMacros(entry.per100, entry.qty);
+      const m = scaleMacros(entry.per100, entry.qty, entry.unit);
       list.append(el('div', { class: 'entry-row' }, [
         el('div', { class: 'entry-main' }, [
           el('div', { class: 'entry-name' }, entry.name),
@@ -79,7 +79,7 @@ function mealCard(dateKeyStr, mealKey, mealLabel, entries) {
 export function renderDiary(container, dateKeyStr) {
   container.innerHTML = '';
   const day = state.getDiaryDay(dateKeyStr);
-  const goals = state.getGoals();
+  const goals = state.getGoals(dateKeyStr);
   const allEntries = [...day.breakfast, ...day.lunch, ...day.dinner, ...day.snacks];
   const totals = sumMacros(allEntries);
 

@@ -36,8 +36,9 @@ export function round1(n) {
   return Math.round(n * 10) / 10;
 }
 
-export function scaleMacros(per100, qty) {
-  const factor = qty / 100;
+export function scaleMacros(per100, qty, unit) {
+  // For 'piece' foods, per100 actually holds macros per 1 piece.
+  const factor = unit === 'piece' ? qty : qty / 100;
   return {
     calories: per100.calories * factor,
     protein: per100.protein * factor,
@@ -49,13 +50,17 @@ export function scaleMacros(per100, qty) {
 export function sumMacros(list) {
   const total = { calories: 0, protein: 0, carbs: 0, fat: 0 };
   for (const item of list) {
-    const m = scaleMacros(item.per100, item.qty);
+    const m = scaleMacros(item.per100, item.qty, item.unit);
     total.calories += m.calories;
     total.protein += m.protein;
     total.carbs += m.carbs;
     total.fat += m.fat;
   }
   return total;
+}
+
+export function perUnitLabel(unit) {
+  return unit === 'piece' ? 'per piece' : `per 100${unit}`;
 }
 
 export function clamp(n, min, max) {

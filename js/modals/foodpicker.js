@@ -1,7 +1,7 @@
 import { el, esc, fmt, fmt1 } from '../dom.js';
 import { openModal, closeModal } from '../modal.js';
 import * as state from '../state.js';
-import { scaleMacros } from '../util.js';
+import { scaleMacros, perUnitLabel } from '../util.js';
 
 const MEAL_LABELS = { breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner', snacks: 'Snacks' };
 
@@ -27,7 +27,7 @@ function renderSearchStep(dateKeyStr, meal, query) {
       const row = el('div', { class: 'food-list-item', onclick: () => renderQtyStep(dateKeyStr, meal, f, query) }, [
         el('div', { class: 'f-main' }, [
           el('div', { class: 'f-name', html: `${esc(f.name)}${f.estimated ? '<span class="badge-est">est.</span>' : ''}` }),
-          el('div', { class: 'f-brand' }, f.brand ? `${f.brand} · per 100${f.unit}` : `per 100${f.unit}`),
+          el('div', { class: 'f-brand' }, f.brand ? `${f.brand} · ${perUnitLabel(f.unit)}` : perUnitLabel(f.unit)),
         ]),
         el('div', { class: 'f-cals' }, `${fmt(f.per100.calories)} kcal`),
       ]);
@@ -55,11 +55,11 @@ function renderSearchStep(dateKeyStr, meal, query) {
 }
 
 function renderQtyStep(dateKeyStr, meal, food, prevQuery) {
-  let qty = 100;
+  let qty = food.defaultQty ?? (food.unit === 'piece' ? 1 : 100);
 
   const preview = el('div', { class: 'preview-box' });
   const renderPreview = () => {
-    const m = scaleMacros(food.per100, qty);
+    const m = scaleMacros(food.per100, qty, food.unit);
     preview.innerHTML = '';
     preview.append(
       el('div', { class: 'preview-row main' }, [el('span', {}, 'Calories'), el('span', { class: 'v' }, `${fmt(m.calories)} kcal`)]),

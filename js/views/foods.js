@@ -1,6 +1,7 @@
 import { el, esc, fmt } from '../dom.js';
 import * as state from '../state.js';
 import { openFoodForm } from '../modals/foodform.js';
+import { perUnitLabel } from '../util.js';
 
 export function renderFoods(container) {
   let query = '';
@@ -43,7 +44,7 @@ export function renderFoods(container) {
         list.append(el('div', { class: 'food-list-item', onclick: () => openFoodForm(f) }, [
           el('div', { class: 'f-main' }, [
             el('div', { class: 'f-name', html: `${esc(f.name)}${f.estimated ? '<span class="badge-est">est.</span>' : ''}` }),
-            el('div', { class: 'f-brand' }, f.brand ? `${f.brand} · per 100${f.unit}` : `per 100${f.unit}${f.custom ? ' · custom' : ''}`),
+            el('div', { class: 'f-brand' }, f.brand ? `${f.brand} · ${perUnitLabel(f.unit)}` : `${perUnitLabel(f.unit)}${f.custom ? ' · custom' : ''}`),
           ]),
           el('div', { class: 'f-cals' }, `${fmt(f.per100.calories)} kcal`),
         ]));
