@@ -11,10 +11,7 @@ function defaultGoals() {
     calories: 2200,
     protein: 165,
     carbs: 220,
-    sugar: 50,
-    fiber: 30,
     fat: 70,
-    satFat: 20,
   };
 }
 

@@ -42,24 +42,18 @@ export function scaleMacros(per100, qty) {
     calories: per100.calories * factor,
     protein: per100.protein * factor,
     carbs: per100.carbs * factor,
-    sugar: per100.sugar * factor,
-    fiber: per100.fiber * factor,
     fat: per100.fat * factor,
-    satFat: per100.satFat * factor,
   };
 }
 
 export function sumMacros(list) {
-  const total = { calories: 0, protein: 0, carbs: 0, sugar: 0, fiber: 0, fat: 0, satFat: 0 };
+  const total = { calories: 0, protein: 0, carbs: 0, fat: 0 };
   for (const item of list) {
     const m = scaleMacros(item.per100, item.qty);
     total.calories += m.calories;
     total.protein += m.protein;
     total.carbs += m.carbs;
-    total.sugar += m.sugar;
-    total.fiber += m.fiber;
     total.fat += m.fat;
-    total.satFat += m.satFat;
   }
   return total;
 }

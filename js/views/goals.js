@@ -5,10 +5,7 @@ const FIELDS = [
   ['calories', 'Calories (kcal)'],
   ['protein', 'Protein (g)'],
   ['carbs', 'Carbs (g)'],
-  ['sugar', 'Sugar (g)'],
-  ['fiber', 'Fiber (g)'],
   ['fat', 'Fat (g)'],
-  ['satFat', 'Saturated fat (g)'],
 ];
 
 export function renderGoals(container) {

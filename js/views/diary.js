@@ -13,10 +13,7 @@ const MEALS = [
 const MACRO_ROWS = [
   ['protein', 'Protein', 'var(--c-protein)', true],
   ['carbs', 'Carbs', 'var(--c-carbs)', false],
-  ['sugar', 'Sugar', 'var(--c-sugar)', false],
-  ['fiber', 'Fiber', 'var(--c-fiber)', false],
   ['fat', 'Fat', 'var(--c-fat)', false],
-  ['satFat', 'Sat. fat', 'var(--c-satfat)', false],
 ];
 
 function barRow(label, color, consumed, goal, emphasize) {

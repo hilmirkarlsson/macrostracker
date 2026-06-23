@@ -65,10 +65,7 @@ function renderQtyStep(dateKeyStr, meal, food, prevQuery) {
       el('div', { class: 'preview-row main' }, [el('span', {}, 'Calories'), el('span', { class: 'v' }, `${fmt(m.calories)} kcal`)]),
       el('div', { class: 'preview-row' }, [el('span', {}, 'Protein'), el('span', { class: 'v' }, `${fmt1(m.protein)} g`)]),
       el('div', { class: 'preview-row' }, [el('span', {}, 'Carbs'), el('span', { class: 'v' }, `${fmt1(m.carbs)} g`)]),
-      el('div', { class: 'preview-row' }, [el('span', {}, 'Sugar'), el('span', { class: 'v' }, `${fmt1(m.sugar)} g`)]),
-      el('div', { class: 'preview-row' }, [el('span', {}, 'Fiber'), el('span', { class: 'v' }, `${fmt1(m.fiber)} g`)]),
       el('div', { class: 'preview-row' }, [el('span', {}, 'Fat'), el('span', { class: 'v' }, `${fmt1(m.fat)} g`)]),
-      el('div', { class: 'preview-row' }, [el('span', {}, 'Sat. fat'), el('span', { class: 'v' }, `${fmt1(m.satFat)} g`)]),
     );
   };
 
