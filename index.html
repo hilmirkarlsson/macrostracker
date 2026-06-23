@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+<title>Macros</title>
+<meta name="theme-color" content="#0f1115" />
+<meta name="description" content="Local-first food diary and macro tracker" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="icon" href="icons/icon-192.png" />
+<link rel="apple-touch-icon" href="icons/icon-192.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Macros" />
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+<div id="app">
+
+  <header class="topbar" id="topbar"></header>
+
+  <main id="view" class="view"></main>
+
+  <nav class="tabbar" id="tabbar">
+    <button class="tab-btn" data-tab="diary" aria-label="Diary">
+      <svg viewBox="0 0 24 24"><path d="M5 4h14a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Zm2 4h10M7 12h10M7 16h6" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>
+      <span>Diary</span>
+    </button>
+    <button class="tab-btn" data-tab="foods" aria-label="Foods">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M12 7v5l3.5 2" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>
+      <span>Foods</span>
+    </button>
+    <button class="tab-btn" data-tab="goals" aria-label="Goals">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="currentColor"/><circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.8" fill="none"/></svg>
+      <span>Goals</span>
+    </button>
+    <button class="tab-btn" data-tab="settings" aria-label="Settings">
+      <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span>Settings</span>
+    </button>
+  </nav>
+</div>
+
+<div id="modal-root"></div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
