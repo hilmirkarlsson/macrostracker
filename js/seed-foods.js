@@ -257,4 +257,7 @@ export const SEED_FOODS = [
   food('kleinur', 'Kleinur', '', 'g', {
     calories: 380, protein: 6, carbs: 45, sugar: 12, fiber: 1, fat: 19, satFat: 8,
   }, { estimated: true }),
+  food('cinnamon-bagel-kronan', 'Cinnamon bagel', 'Krónan', 'g', {
+    calories: 271, protein: 9, carbs: 55, sugar: 8, fiber: 2.5, fat: 1.6, satFat: 0.3,
+  }, { estimated: true }),
 ];
