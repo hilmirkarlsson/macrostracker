@@ -1,4 +1,4 @@
-const CACHE_NAME = 'macros-cache-v1';
+const CACHE_NAME = 'macros-cache-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -11,12 +11,14 @@ const ASSETS = [
   './js/storage.js',
   './js/seed-foods.js',
   './js/util.js',
+  './js/lookup.js',
   './js/views/diary.js',
   './js/views/foods.js',
   './js/views/goals.js',
   './js/views/settings.js',
   './js/modals/foodpicker.js',
   './js/modals/foodform.js',
+  './js/modals/scan.js',
   './icons/icon-192.png',
   './icons/icon-512.png',
 ];

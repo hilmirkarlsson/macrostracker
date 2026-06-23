@@ -1,6 +1,8 @@
 import { el } from '../dom.js';
 import { openModal, closeModal } from '../modal.js';
 import * as state from '../state.js';
+import { openBarcodeScanner } from './scan.js';
+import { lookupBarcode } from '../lookup.js';
 
 const MACRO_FIELDS = [
   ['calories', 'Calories (kcal)'],
@@ -12,11 +14,12 @@ const MACRO_FIELDS = [
   ['satFat', 'Sat. fat (g)'],
 ];
 
-export function openFoodForm(existing) {
-  let unit = existing?.unit || 'g';
+export function openFoodForm(existing, opts = {}) {
+  const prefill = opts.prefill || null;
+  let unit = existing?.unit || prefill?.unit || 'g';
 
-  const nameInput = el('input', { type: 'text', placeholder: 'e.g. Greek yogurt', value: existing?.name || '' });
-  const brandInput = el('input', { type: 'text', placeholder: 'Optional', value: existing?.brand || '' });
+  const nameInput = el('input', { type: 'text', placeholder: 'e.g. Greek yogurt', value: existing?.name ?? prefill?.name ?? '' });
+  const brandInput = el('input', { type: 'text', placeholder: 'Optional', value: existing?.brand ?? prefill?.brand ?? '' });
 
   const gBtn = el('button', { type: 'button', class: unit === 'g' ? 'active' : '', onclick: () => setUnit('g') }, 'grams (g)');
   const mlBtn = el('button', { type: 'button', class: unit === 'ml' ? 'active' : '', onclick: () => setUnit('ml') }, 'milliliters (ml)');
@@ -29,9 +32,10 @@ export function openFoodForm(existing) {
   const macroInputs = {};
   const macroGrid = el('div', { class: 'macro-grid' });
   for (const [key, label] of MACRO_FIELDS) {
+    const source = existing ? existing.per100 : prefill?.per100;
     const input = el('input', {
       type: 'number', inputmode: 'decimal', min: '0', step: '0.1',
-      value: existing ? String(existing.per100[key]) : '',
+      value: source ? String(source[key] ?? '') : '',
       placeholder: '0',
     });
     macroInputs[key] = input;
@@ -40,7 +44,36 @@ export function openFoodForm(existing) {
 
   const errorBox = el('div', { class: 'muted', style: 'color:var(--danger);margin-bottom:10px;display:none' });
 
+  const noticeBox = opts.notice
+    ? el('div', { class: 'muted', style: 'margin-bottom:14px' }, opts.notice)
+    : null;
+
+  async function startScan() {
+    const code = await openBarcodeScanner();
+    if (!code) {
+      openFoodForm(existing, opts);
+      return;
+    }
+    openModal({ title: 'Looking up…', body: el('div', { class: 'muted' }, `Looking up barcode ${code}…`) });
+    try {
+      const result = await lookupBarcode(code);
+      if (!result) {
+        openFoodForm(null, { notice: `No match found for barcode ${code} — fill it in manually below.` });
+        return;
+      }
+      openFoodForm(null, { prefill: result, notice: 'Auto-filled from Open Food Facts — double-check against the label.' });
+    } catch (e) {
+      openFoodForm(null, { notice: "Couldn't reach the lookup service. Check your connection or fill this in manually." });
+    }
+  }
+
+  const scanBtn = !existing
+    ? el('button', { type: 'button', class: 'btn btn-secondary', style: 'margin-bottom:14px', onclick: startScan }, '📷 Scan barcode')
+    : null;
+
   const body = el('div', {}, [
+    scanBtn,
+    noticeBox,
     el('div', { class: 'field' }, [el('label', {}, 'Name'), nameInput]),
     el('div', { class: 'field' }, [el('label', {}, 'Brand'), brandInput]),
     el('div', { class: 'field' }, [
