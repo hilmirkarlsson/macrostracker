@@ -1,4 +1,4 @@
-const CACHE_NAME = 'macros-cache-v6';
+const CACHE_NAME = 'macros-cache-v7';
 const ASSETS = [
   './',
   './index.html',
