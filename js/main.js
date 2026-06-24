@@ -4,18 +4,22 @@ import { todayKey, addDays, formatDisplayDate } from './util.js';
 import { renderDiary } from './views/diary.js';
 import { renderFoods } from './views/foods.js';
 import { renderGoals } from './views/goals.js';
+import { renderStats } from './views/stats.js';
 import { renderSettings } from './views/settings.js';
 
 const topbar = document.getElementById('topbar');
 const view = document.getElementById('view');
+const tabbar = document.getElementById('tabbar');
 const tabButtons = document.querySelectorAll('.tab-btn');
+const TAB_ORDER = Array.from(tabButtons).map((btn) => btn.dataset.tab);
+tabbar.style.setProperty('--tab-count', String(TAB_ORDER.length));
 
 const ctx = {
   tab: 'diary',
   dateKey: todayKey(),
 };
 
-const TAB_TITLES = { foods: 'Food database', goals: 'Daily goals', settings: 'Settings' };
+const TAB_TITLES = { foods: 'Food database', goals: 'Daily goals', stats: 'Progress', settings: 'Settings' };
 
 function renderTopbar() {
   topbar.innerHTML = '';
@@ -41,6 +45,7 @@ function renderView() {
   if (ctx.tab === 'diary') renderDiary(view, ctx.dateKey);
   else if (ctx.tab === 'foods') renderFoods(view);
   else if (ctx.tab === 'goals') renderGoals(view);
+  else if (ctx.tab === 'stats') renderStats(view);
   else if (ctx.tab === 'settings') renderSettings(view);
 }
 
@@ -48,6 +53,7 @@ function renderTabbar() {
   tabButtons.forEach((btn) => {
     btn.classList.toggle('active', btn.dataset.tab === ctx.tab);
   });
+  tabbar.style.setProperty('--active-index', String(TAB_ORDER.indexOf(ctx.tab)));
 }
 
 function render() {

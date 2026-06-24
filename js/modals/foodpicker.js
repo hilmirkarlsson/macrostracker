@@ -1,7 +1,7 @@
 import { el, esc, fmt, fmt1 } from '../dom.js';
 import { openModal, closeModal } from '../modal.js';
 import * as state from '../state.js';
-import { scaleMacros, perUnitLabel } from '../util.js';
+import { scaleMacros, perUnitLabel, foodAvatar } from '../util.js';
 
 const MEAL_LABELS = { breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner', snacks: 'Snacks' };
 
@@ -24,7 +24,9 @@ function renderSearchStep(dateKeyStr, meal, query) {
     list.append(el('div', { class: 'empty-state' }, 'No foods match. Try a different search, or add a new food from the Foods tab.'));
   } else {
     for (const f of foods) {
+      const av = foodAvatar(f.name);
       const row = el('div', { class: 'food-list-item', onclick: () => renderQtyStep(dateKeyStr, meal, f, query) }, [
+        el('div', { class: 'f-avatar', style: `background:color-mix(in srgb, ${av.color} 20%, transparent);color:${av.color}` }, av.letter),
         el('div', { class: 'f-main' }, [
           el('div', { class: 'f-name', html: `${esc(f.name)}${f.estimated ? '<span class="badge-est">est.</span>' : ''}` }),
           el('div', { class: 'f-brand' }, f.brand ? `${f.brand} · ${perUnitLabel(f.unit)}` : perUnitLabel(f.unit)),
@@ -42,16 +44,60 @@ function renderSearchStep(dateKeyStr, meal, query) {
     oninput: (e) => renderSearchStep(dateKeyStr, meal, e.target.value),
   });
 
+  const quickBtn = el('button', { class: 'quick-add-btn', onclick: () => renderQuickStep(dateKeyStr, meal, query) }, [
+    el('div', { html: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>' }),
+    el('span', {}, 'Quick add calories'),
+  ]);
+
   const body = el('div', {}, [
     el('div', { class: 'search-box' }, [
       el('div', { html: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>' }),
       searchInput,
     ]),
+    quickBtn,
     list,
   ]);
 
   openModal({ title: `Add to ${MEAL_LABELS[meal]}`, body });
   setTimeout(() => searchInput.focus(), 50);
+}
+
+// Logs exact macros with no backing food — for restaurant meals etc.
+function renderQuickStep(dateKeyStr, meal, prevQuery) {
+  const FIELDS = [
+    ['calories', 'Calories (kcal)', true],
+    ['protein', 'Protein (g)', false],
+    ['carbs', 'Carbs (g)', false],
+    ['fat', 'Fat (g)', false],
+  ];
+  const inputs = {};
+  const grid = el('div', { class: 'macro-grid' });
+  for (const [key, label] of FIELDS) {
+    const input = el('input', { type: 'number', inputmode: 'decimal', min: '0', step: '1', placeholder: '0' });
+    inputs[key] = input;
+    grid.append(el('div', { class: 'field' }, [el('label', {}, label), input]));
+  }
+  const nameInput = el('input', { type: 'text', placeholder: 'e.g. Restaurant meal' });
+
+  const body = el('div', {}, [
+    el('div', { class: 'field' }, [el('label', {}, 'Label (optional)'), nameInput]),
+    grid,
+    el('button', { class: 'btn btn-secondary', style: 'margin-top:4px', onclick: () => renderSearchStep(dateKeyStr, meal, prevQuery) }, '← Back to search'),
+  ]);
+
+  const foot = el('button', { class: 'btn btn-primary', onclick: () => {
+    const macros = {};
+    for (const [key] of FIELDS) {
+      const v = parseFloat(inputs[key].value);
+      macros[key] = Number.isFinite(v) && v >= 0 ? v : 0;
+    }
+    if (macros.calories <= 0 && macros.protein <= 0 && macros.carbs <= 0 && macros.fat <= 0) return;
+    state.addQuickEntry(dateKeyStr, meal, macros, nameInput.value.trim() || 'Quick add');
+    closeModal();
+  } }, `Add to ${MEAL_LABELS[meal]}`);
+
+  openModal({ title: 'Quick add', body, foot });
+  setTimeout(() => inputs.calories.focus(), 50);
 }
 
 function renderQtyStep(dateKeyStr, meal, food, prevQuery) {
@@ -67,6 +113,10 @@ function renderQtyStep(dateKeyStr, meal, food, prevQuery) {
       el('div', { class: 'preview-row' }, [el('span', {}, 'Carbs'), el('span', { class: 'v' }, `${fmt1(m.carbs)} g`)]),
       el('div', { class: 'preview-row' }, [el('span', {}, 'Fat'), el('span', { class: 'v' }, `${fmt1(m.fat)} g`)]),
     );
+    if (food.per100.fiber > 0 || food.per100.sugar > 0) {
+      if (food.per100.sugar > 0) preview.append(el('div', { class: 'preview-row sub' }, [el('span', {}, 'of which sugar'), el('span', { class: 'v' }, `${fmt1(m.sugar)} g`)]));
+      if (food.per100.fiber > 0) preview.append(el('div', { class: 'preview-row sub' }, [el('span', {}, 'Fiber'), el('span', { class: 'v' }, `${fmt1(m.fiber)} g`)]));
+    }
   };
 
   const qtyInput = el('input', {

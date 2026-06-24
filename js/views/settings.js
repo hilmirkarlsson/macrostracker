@@ -29,8 +29,14 @@ export function renderSettings(container) {
     fileInput.value = '';
   });
 
+  const cloudIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18a4 4 0 0 1-.6-7.96A5.5 5.5 0 0 1 17 9.5a3.5 3.5 0 0 1 .5 6.97M12 11v7m0 0-2.5-2.4M12 18l2.5-2.4"/></svg>';
+  const infoIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5.2M12 8.3v.2"/></svg>';
+
   const backupCard = el('div', { class: 'card settings-section' }, [
-    el('h2', {}, 'Backup & restore'),
+    el('div', { class: 'section-title' }, [
+      el('div', { class: 'icon-chip', style: '--mc:var(--c-protein)' }, [el('div', { html: cloudIcon })]),
+      el('h2', {}, 'Backup & restore'),
+    ]),
     el('div', { class: 'muted', style: 'margin-bottom:12px' },
       'Everything is stored locally in this browser. Export a backup occasionally, or before switching devices/browsers — the exported file is the same JSON shape a future cloud sync (e.g. Google Drive) would use.'),
     el('div', { class: 'btn-row' }, [
@@ -51,7 +57,10 @@ export function renderSettings(container) {
   ]);
 
   const aboutCard = el('div', { class: 'card settings-section' }, [
-    el('h2', {}, 'About'),
+    el('div', { class: 'section-title' }, [
+      el('div', { class: 'icon-chip', style: '--mc:var(--c-fiber)' }, [el('div', { html: infoIcon })]),
+      el('h2', {}, 'About'),
+    ]),
     el('div', { class: 'muted' }, [
       'Local-first food diary — your data never leaves this device unless you export it. ',
       'On your phone, use your browser’s "Add to Home Screen" option to install this as an app.',

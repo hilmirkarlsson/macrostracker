@@ -4,7 +4,7 @@
 import { SEED_FOODS } from './seed-foods.js';
 
 const STORAGE_KEY = 'mft:data:v1';
-const SCHEMA_VERSION = 2;
+const SCHEMA_VERSION = 3;
 
 function defaultFlatGoals() {
   return {
@@ -48,11 +48,12 @@ function defaultState() {
     foods: SEED_FOODS.map((f) => ({ ...f })),
     meals: [],
     diary: {},
+    weights: {},
   };
 }
 
 function emptyDay() {
-  return { dayType: null, breakfast: [], lunch: [], dinner: [], snacks: [] };
+  return { dayType: null, breakfast: [], lunch: [], dinner: [], snacks: [], water: 0 };
 }
 
 // One-time upgrade from the original flat-goals, gram-only-foods schema.
@@ -81,8 +82,20 @@ function migrateV1toV2(state) {
   return state;
 }
 
+// Adds weight tracking and per-day water; both are purely additive.
+function migrateV2toV3(state) {
+  state.weights = state.weights || {};
+  state.diary = state.diary || {};
+  for (const day of Object.values(state.diary)) {
+    if (day.water === undefined) day.water = 0;
+  }
+  state.version = 3;
+  return state;
+}
+
 function migrate(state) {
   if (!state.version || state.version < 2) state = migrateV1toV2(state);
+  if (state.version < 3) state = migrateV2toV3(state);
   return state;
 }
 

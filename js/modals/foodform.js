@@ -12,6 +12,12 @@ const MACRO_FIELDS = [
   ['fat', 'Fat (g)'],
 ];
 
+const MICRO_FIELDS = [
+  ['sugar', 'Sugar (g)'],
+  ['fiber', 'Fiber (g)'],
+  ['satFat', 'Sat fat (g)'],
+];
+
 export function openFoodForm(existing, opts = {}) {
   const prefill = opts.prefill || null;
   let unit = existing?.unit || prefill?.unit || 'g';
@@ -28,9 +34,9 @@ export function openFoodForm(existing, opts = {}) {
   }
 
   const macroInputs = {};
+  const source = existing ? existing.per100 : prefill?.per100;
   const macroGrid = el('div', { class: 'macro-grid' });
   for (const [key, label] of MACRO_FIELDS) {
-    const source = existing ? existing.per100 : prefill?.per100;
     const input = el('input', {
       type: 'number', inputmode: 'decimal', min: '0', step: '0.1',
       value: source ? String(source[key] ?? '') : '',
@@ -38,6 +44,17 @@ export function openFoodForm(existing, opts = {}) {
     });
     macroInputs[key] = input;
     macroGrid.append(el('div', { class: 'field' }, [el('label', {}, label), input]));
+  }
+
+  const microGrid = el('div', { class: 'macro-grid' });
+  for (const [key, label] of MICRO_FIELDS) {
+    const input = el('input', {
+      type: 'number', inputmode: 'decimal', min: '0', step: '0.1',
+      value: source && source[key] ? String(source[key]) : '',
+      placeholder: '0',
+    });
+    macroInputs[key] = input;
+    microGrid.append(el('div', { class: 'field' }, [el('label', {}, label), input]));
   }
 
   const errorBox = el('div', { class: 'muted', style: 'color:var(--danger);margin-bottom:10px;display:none' });
@@ -66,11 +83,17 @@ export function openFoodForm(existing, opts = {}) {
   }
 
   const scanBtn = !existing
-    ? el('button', { type: 'button', class: 'btn btn-secondary', style: 'margin-bottom:10px', onclick: startScan }, '📷 Scan barcode')
+    ? el('button', { type: 'button', class: 'btn btn-secondary', style: 'margin-bottom:10px', onclick: startScan }, [
+        el('div', { html: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8a1 1 0 0 1 1-1h1.5l1-1.5h7l1 1.5H17a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Z"/><circle cx="12" cy="12.5" r="3.2"/></svg>' }),
+        'Scan barcode',
+      ])
     : null;
 
   const searchBtn = !existing
-    ? el('button', { type: 'button', class: 'btn btn-secondary', style: 'margin-bottom:14px', onclick: () => openOnlineSearch('') }, '🔍 Search online')
+    ? el('button', { type: 'button', class: 'btn btn-secondary', style: 'margin-bottom:14px', onclick: () => openOnlineSearch('') }, [
+        el('div', { html: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>' }),
+        'Search online',
+      ])
     : null;
 
   const body = el('div', {}, [
@@ -85,6 +108,8 @@ export function openFoodForm(existing, opts = {}) {
     ]),
     el('div', { class: 'field' }, [el('label', {}, `Per 100 ${unit === 'g' ? 'grams' : 'ml'}`)]),
     macroGrid,
+    el('div', { class: 'field', style: 'margin-top:6px' }, [el('label', {}, 'Optional — sugar, fiber, saturated fat')]),
+    microGrid,
     errorBox,
   ]);
 
@@ -110,7 +135,7 @@ export function openFoodForm(existing, opts = {}) {
       return;
     }
     const per100 = {};
-    for (const [key] of MACRO_FIELDS) {
+    for (const [key] of [...MACRO_FIELDS, ...MICRO_FIELDS]) {
       const v = parseFloat(macroInputs[key].value);
       per100[key] = Number.isFinite(v) && v >= 0 ? v : 0;
     }

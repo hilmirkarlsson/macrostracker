@@ -263,4 +263,34 @@ export const SEED_FOODS = [
   food('cinnamon-bagel-kronan', 'Cinnamon bagel', 'Krónan', 'g', {
     calories: 271, protein: 9, carbs: 55, sugar: 8, fiber: 2.5, fat: 1.6, satFat: 0.3,
   }, { estimated: true }),
+
+  // Krónan — nutrition read directly from the printed declarations on
+  // kronan.is product pages (per 100 g/ml), so these are not estimates.
+  food('kronan-isey-skyr-vanilla', 'Ísey skyr vanilla', 'Ísey', 'g', {
+    calories: 56, protein: 9.8, carbs: 3.7, sugar: 3.3, fiber: 0, fat: 0.2, satFat: 0.1,
+  }, { quickAdd: true, defaultQty: 170 }),
+  food('kronan-ms-nymjolk', 'MS nýmjólk (whole milk)', 'MS', 'ml', {
+    calories: 67, protein: 3.4, carbs: 4.5, sugar: 4.5, fiber: 0, fat: 3.9, satFat: 2.3,
+  }, { defaultQty: 250 }),
+  food('kronan-ms-lettmjolk', 'MS léttmjólk (low-fat milk)', 'MS', 'ml', {
+    calories: 45, protein: 3.4, carbs: 4.5, sugar: 4.5, fiber: 0, fat: 1.5, satFat: 0.9,
+  }, { defaultQty: 250 }),
+  food('kronan-ungnautahakk', 'Ungnautahakk (beef mince, <12% fat)', 'Ódýrt', 'g', {
+    calories: 166, protein: 19, carbs: 0, sugar: 0, fiber: 0, fat: 10, satFat: 4,
+  }),
+  food('kronan-kjuklingabringur', 'Kjúklingabringur, frosnar (chicken breast)', 'Ódýrt', 'g', {
+    calories: 112, protein: 22, carbs: 0.5, sugar: 0.5, fiber: 0, fat: 2.5, satFat: 0.8,
+  }),
+  food('kronan-hledsla-saltkaramellu', 'Hleðsla próteinskyr – saltkaramella', 'MS', 'g', {
+    calories: 68, protein: 12, carbs: 4.1, sugar: 3.6, fiber: 0, fat: 0.5, satFat: 0.4,
+  }, { quickAdd: true, defaultQty: 170 }),
+  food('kronan-isey-proteindrykkur-sukkuladi', 'Ísey skyr próteindrykkur – súkkulaði & vanilla', 'Ísey', 'ml', {
+    calories: 51, protein: 7.4, carbs: 3.9, sugar: 3.5, fiber: 0, fat: 0.7, satFat: 0.4,
+  }, { quickAdd: true, defaultQty: 300 }),
+  food('kronan-arna-proteindrykkur-sukkuladi', 'Arna+ próteindrykkur – súkkulaði', 'Arna', 'ml', {
+    calories: 69, protein: 10, carbs: 6.7, sugar: 6.6, fiber: 0, fat: 0.3, satFat: 0.1,
+  }, { quickAdd: true, defaultQty: 300 }),
+  food('kronan-propud-sukkuladi', 'Propud próteinbúðingur – súkkulaði', 'Propud', 'g', {
+    calories: 72, protein: 10, carbs: 4.6, sugar: 4.6, fiber: 0, fat: 1.5, satFat: 1.1,
+  }, { quickAdd: true, defaultQty: 200 }),
 ];
