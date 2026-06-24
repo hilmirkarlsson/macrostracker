@@ -25,6 +25,9 @@ export async function lookupBarcode(code) {
       protein: round1(n['proteins_100g']),
       carbs: round1(n['carbohydrates_100g']),
       fat: round1(n['fat_100g']),
+      sugar: round1(n['sugars_100g']),
+      fiber: round1(n['fiber_100g']),
+      satFat: round1(n['saturated-fat_100g']),
     },
   };
 }

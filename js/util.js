@@ -40,23 +40,46 @@ export function scaleMacros(per100, qty, unit) {
   // For 'piece' foods, per100 actually holds macros per 1 piece.
   const factor = unit === 'piece' ? qty : qty / 100;
   return {
-    calories: per100.calories * factor,
-    protein: per100.protein * factor,
-    carbs: per100.carbs * factor,
-    fat: per100.fat * factor,
+    calories: (per100.calories || 0) * factor,
+    protein: (per100.protein || 0) * factor,
+    carbs: (per100.carbs || 0) * factor,
+    fat: (per100.fat || 0) * factor,
+    sugar: (per100.sugar || 0) * factor,
+    fiber: (per100.fiber || 0) * factor,
+    satFat: (per100.satFat || 0) * factor,
   };
 }
 
 export function sumMacros(list) {
-  const total = { calories: 0, protein: 0, carbs: 0, fat: 0 };
+  const total = { calories: 0, protein: 0, carbs: 0, fat: 0, sugar: 0, fiber: 0, satFat: 0 };
   for (const item of list) {
     const m = scaleMacros(item.per100, item.qty, item.unit);
     total.calories += m.calories;
     total.protein += m.protein;
     total.carbs += m.carbs;
     total.fat += m.fat;
+    total.sugar += m.sugar;
+    total.fiber += m.fiber;
+    total.satFat += m.satFat;
   }
   return total;
+}
+
+export const WATER_GOAL_CUPS = 8;
+export const WATER_CUP_ML = 250;
+
+// Returns an array of the last `n` date keys ending at (and including) `endKey`,
+// oldest first.
+export function lastNDays(endKey, n) {
+  const out = [];
+  for (let i = n - 1; i >= 0; i--) out.push(addDays(endKey, -i));
+  return out;
+}
+
+// Short weekday + day-of-month label, e.g. "Mon 3", for chart axes.
+export function shortDayLabel(dateKeyStr) {
+  const [y, m, d] = dateKeyStr.split('-').map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString(undefined, { weekday: 'short' });
 }
 
 export function perUnitLabel(unit) {

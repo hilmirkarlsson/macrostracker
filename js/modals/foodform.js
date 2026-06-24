@@ -11,6 +11,12 @@ const MACRO_FIELDS = [
   ['fat', 'Fat (g)'],
 ];
 
+const MICRO_FIELDS = [
+  ['sugar', 'Sugar (g)'],
+  ['fiber', 'Fiber (g)'],
+  ['satFat', 'Sat fat (g)'],
+];
+
 export function openFoodForm(existing, opts = {}) {
   const prefill = opts.prefill || null;
   let unit = existing?.unit || prefill?.unit || 'g';
@@ -27,9 +33,9 @@ export function openFoodForm(existing, opts = {}) {
   }
 
   const macroInputs = {};
+  const source = existing ? existing.per100 : prefill?.per100;
   const macroGrid = el('div', { class: 'macro-grid' });
   for (const [key, label] of MACRO_FIELDS) {
-    const source = existing ? existing.per100 : prefill?.per100;
     const input = el('input', {
       type: 'number', inputmode: 'decimal', min: '0', step: '0.1',
       value: source ? String(source[key] ?? '') : '',
@@ -37,6 +43,17 @@ export function openFoodForm(existing, opts = {}) {
     });
     macroInputs[key] = input;
     macroGrid.append(el('div', { class: 'field' }, [el('label', {}, label), input]));
+  }
+
+  const microGrid = el('div', { class: 'macro-grid' });
+  for (const [key, label] of MICRO_FIELDS) {
+    const input = el('input', {
+      type: 'number', inputmode: 'decimal', min: '0', step: '0.1',
+      value: source && source[key] ? String(source[key]) : '',
+      placeholder: '0',
+    });
+    macroInputs[key] = input;
+    microGrid.append(el('div', { class: 'field' }, [el('label', {}, label), input]));
   }
 
   const errorBox = el('div', { class: 'muted', style: 'color:var(--danger);margin-bottom:10px;display:none' });
@@ -82,6 +99,8 @@ export function openFoodForm(existing, opts = {}) {
     ]),
     el('div', { class: 'field' }, [el('label', {}, `Per 100 ${unit === 'g' ? 'grams' : 'ml'}`)]),
     macroGrid,
+    el('div', { class: 'field', style: 'margin-top:6px' }, [el('label', {}, 'Optional — sugar, fiber, saturated fat')]),
+    microGrid,
     errorBox,
   ]);
 
@@ -107,7 +126,7 @@ export function openFoodForm(existing, opts = {}) {
       return;
     }
     const per100 = {};
-    for (const [key] of MACRO_FIELDS) {
+    for (const [key] of [...MACRO_FIELDS, ...MICRO_FIELDS]) {
       const v = parseFloat(macroInputs[key].value);
       per100[key] = Number.isFinite(v) && v >= 0 ? v : 0;
     }

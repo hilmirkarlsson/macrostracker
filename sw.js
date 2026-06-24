@@ -1,4 +1,4 @@
-const CACHE_NAME = 'macros-cache-v4';
+const CACHE_NAME = 'macros-cache-v5';
 const ASSETS = [
   './',
   './index.html',
@@ -15,6 +15,7 @@ const ASSETS = [
   './js/views/diary.js',
   './js/views/foods.js',
   './js/views/goals.js',
+  './js/views/stats.js',
   './js/views/settings.js',
   './js/modals/foodpicker.js',
   './js/modals/foodform.js',

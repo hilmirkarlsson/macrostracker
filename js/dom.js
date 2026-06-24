@@ -34,3 +34,23 @@ export function fmt(n) {
 export function fmt1(n) {
   return (Math.round(n * 10) / 10).toString();
 }
+
+let toastTimer = null;
+export function toast(msg) {
+  let t = document.getElementById('toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'toast';
+    t.className = 'toast';
+    t.setAttribute('role', 'status');
+    t.setAttribute('aria-live', 'polite');
+    document.body.append(t);
+  }
+  t.textContent = msg;
+  // restart the enter animation
+  t.classList.remove('show');
+  void t.offsetWidth;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}

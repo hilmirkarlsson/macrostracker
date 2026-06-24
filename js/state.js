@@ -1,6 +1,6 @@
 import * as storage from './storage.js';
 import { getDay } from './storage.js';
-import { uid } from './util.js';
+import { uid, addDays } from './util.js';
 
 const data = storage.load();
 const listeners = new Set();
@@ -189,6 +189,80 @@ export function updateEntryQty(dateKeyStr, meal, entryId, qty) {
   if (!entry) return;
   entry.qty = qty;
   commit();
+}
+
+// Adds an ad-hoc "quick" entry with exact macros (no backing food). Stored as a
+// single-piece item with qty 1 so existing scale/sum logic gives exact totals.
+export function addQuickEntry(dateKeyStr, meal, macros, label) {
+  const day = getDiaryDay(dateKeyStr);
+  day[meal].push({
+    id: uid(),
+    foodId: null,
+    name: label || 'Quick add',
+    brand: '',
+    unit: 'piece',
+    per100: {
+      calories: macros.calories || 0,
+      protein: macros.protein || 0,
+      carbs: macros.carbs || 0,
+      fat: macros.fat || 0,
+      sugar: macros.sugar || 0,
+      fiber: macros.fiber || 0,
+    },
+    qty: 1,
+    quick: true,
+  });
+  commit();
+}
+
+// Copies the same meal from the most recent earlier day that has entries in it,
+// cloning each line with a fresh id. Returns how many entries were copied.
+export function copyMealFromPrevious(dateKeyStr, meal, lookbackDays = 30) {
+  const day = getDiaryDay(dateKeyStr);
+  let cursor = dateKeyStr;
+  for (let i = 0; i < lookbackDays; i++) {
+    cursor = addDays(cursor, -1);
+    const src = data.diary[cursor];
+    if (src && Array.isArray(src[meal]) && src[meal].length > 0) {
+      for (const entry of src[meal]) {
+        day[meal].push({ ...entry, per100: { ...entry.per100 }, id: uid() });
+      }
+      commit();
+      return src[meal].length;
+    }
+  }
+  return 0;
+}
+
+export function getWater(dateKeyStr) {
+  return getDiaryDay(dateKeyStr).water || 0;
+}
+
+export function setWater(dateKeyStr, cups) {
+  const day = getDiaryDay(dateKeyStr);
+  day.water = Math.max(0, Math.min(30, Math.round(cups)));
+  commit();
+}
+
+export function getWeights() {
+  return data.weights || {};
+}
+
+export function getWeight(dateKeyStr) {
+  return (data.weights || {})[dateKeyStr];
+}
+
+export function setWeight(dateKeyStr, kg) {
+  if (!data.weights) data.weights = {};
+  data.weights[dateKeyStr] = kg;
+  commit();
+}
+
+export function removeWeight(dateKeyStr) {
+  if (data.weights && data.weights[dateKeyStr] !== undefined) {
+    delete data.weights[dateKeyStr];
+    commit();
+  }
 }
 
 export function getMeals() {
