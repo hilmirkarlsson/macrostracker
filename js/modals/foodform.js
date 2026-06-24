@@ -65,7 +65,10 @@ export function openFoodForm(existing, opts = {}) {
   }
 
   const scanBtn = !existing
-    ? el('button', { type: 'button', class: 'btn btn-secondary', style: 'margin-bottom:14px', onclick: startScan }, '📷 Scan barcode')
+    ? el('button', { type: 'button', class: 'btn btn-secondary', style: 'margin-bottom:14px', onclick: startScan }, [
+        el('div', { html: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8a1 1 0 0 1 1-1h1.5l1-1.5h7l1 1.5H17a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Z"/><circle cx="12" cy="12.5" r="3.2"/></svg>' }),
+        'Scan barcode',
+      ])
     : null;
 
   const body = el('div', {}, [

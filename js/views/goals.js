@@ -20,8 +20,14 @@ export function renderGoals(container) {
   });
   inputs.protein = proteinInput;
 
+  const targetIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3" fill="currentColor" stroke="none"/></svg>';
+  const gridIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg>';
+
   const proteinCard = el('div', { class: 'card' }, [
-    el('h2', {}, 'Daily protein target'),
+    el('div', { class: 'section-title' }, [
+      el('div', { class: 'icon-chip', style: '--mc:var(--c-protein)' }, [el('div', { html: targetIcon })]),
+      el('h2', {}, 'Daily protein target'),
+    ]),
     el('div', { class: 'field' }, [proteinInput]),
     el('div', { class: 'muted' }, 'Tracked closely — shown as the bold bar on your diary.'),
   ]);
@@ -38,7 +44,10 @@ export function renderGoals(container) {
   }
 
   const otherCard = el('div', { class: 'card' }, [
-    el('h2', {}, 'Other daily targets'),
+    el('div', { class: 'section-title' }, [
+      el('div', { class: 'icon-chip', style: '--mc:var(--c-fat)' }, [el('div', { html: gridIcon })]),
+      el('h2', {}, 'Other daily targets'),
+    ]),
     otherGrid,
   ]);
 

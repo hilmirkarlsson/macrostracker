@@ -1,7 +1,7 @@
 import { el, esc, fmt, fmt1 } from '../dom.js';
 import { openModal, closeModal } from '../modal.js';
 import * as state from '../state.js';
-import { scaleMacros, perUnitLabel } from '../util.js';
+import { scaleMacros, perUnitLabel, foodAvatar } from '../util.js';
 
 const MEAL_LABELS = { breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner', snacks: 'Snacks' };
 
@@ -24,7 +24,9 @@ function renderSearchStep(dateKeyStr, meal, query) {
     list.append(el('div', { class: 'empty-state' }, 'No foods match. Try a different search, or add a new food from the Foods tab.'));
   } else {
     for (const f of foods) {
+      const av = foodAvatar(f.name);
       const row = el('div', { class: 'food-list-item', onclick: () => renderQtyStep(dateKeyStr, meal, f, query) }, [
+        el('div', { class: 'f-avatar', style: `background:color-mix(in srgb, ${av.color} 20%, transparent);color:${av.color}` }, av.letter),
         el('div', { class: 'f-main' }, [
           el('div', { class: 'f-name', html: `${esc(f.name)}${f.estimated ? '<span class="badge-est">est.</span>' : ''}` }),
           el('div', { class: 'f-brand' }, f.brand ? `${f.brand} · ${perUnitLabel(f.unit)}` : perUnitLabel(f.unit)),

@@ -8,7 +8,9 @@ import { renderSettings } from './views/settings.js';
 
 const topbar = document.getElementById('topbar');
 const view = document.getElementById('view');
+const tabbar = document.getElementById('tabbar');
 const tabButtons = document.querySelectorAll('.tab-btn');
+const TAB_ORDER = Array.from(tabButtons).map((btn) => btn.dataset.tab);
 
 const ctx = {
   tab: 'diary',
@@ -48,6 +50,7 @@ function renderTabbar() {
   tabButtons.forEach((btn) => {
     btn.classList.toggle('active', btn.dataset.tab === ctx.tab);
   });
+  tabbar.style.setProperty('--active-index', String(TAB_ORDER.indexOf(ctx.tab)));
 }
 
 function render() {

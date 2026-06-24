@@ -67,6 +67,15 @@ export function clamp(n, min, max) {
   return Math.max(min, Math.min(max, n));
 }
 
+const AVATAR_COLORS = ['var(--c-calories)', 'var(--c-protein)', 'var(--c-carbs)', 'var(--c-fat)', 'var(--c-fiber)', 'var(--c-sugar)'];
+
+export function foodAvatar(name) {
+  const trimmed = (name || '?').trim();
+  let hash = 0;
+  for (let i = 0; i < trimmed.length; i++) hash = (hash * 31 + trimmed.charCodeAt(i)) % AVATAR_COLORS.length;
+  return { letter: trimmed.charAt(0).toUpperCase() || '?', color: AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length] };
+}
+
 export function debounce(fn, ms) {
   let t;
   return (...args) => {
