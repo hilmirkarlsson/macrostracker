@@ -1,8 +1,9 @@
-import { el } from '../dom.js';
+import { el, esc, fmt } from '../dom.js';
 import { openModal, closeModal } from '../modal.js';
 import * as state from '../state.js';
 import { openBarcodeScanner } from './scan.js';
-import { lookupBarcode } from '../lookup.js';
+import { lookupBarcode, searchFoodProducts } from '../lookup.js';
+import { debounce } from '../util.js';
 
 const MACRO_FIELDS = [
   ['calories', 'Calories (kcal)'],
@@ -65,11 +66,16 @@ export function openFoodForm(existing, opts = {}) {
   }
 
   const scanBtn = !existing
-    ? el('button', { type: 'button', class: 'btn btn-secondary', style: 'margin-bottom:14px', onclick: startScan }, '📷 Scan barcode')
+    ? el('button', { type: 'button', class: 'btn btn-secondary', style: 'margin-bottom:10px', onclick: startScan }, '📷 Scan barcode')
+    : null;
+
+  const searchBtn = !existing
+    ? el('button', { type: 'button', class: 'btn btn-secondary', style: 'margin-bottom:14px', onclick: () => openOnlineSearch('') }, '🔍 Search online')
     : null;
 
   const body = el('div', {}, [
     scanBtn,
+    searchBtn,
     noticeBox,
     el('div', { class: 'field' }, [el('label', {}, 'Name'), nameInput]),
     el('div', { class: 'field' }, [el('label', {}, 'Brand'), brandInput]),
@@ -116,4 +122,61 @@ export function openFoodForm(existing, opts = {}) {
 
   openModal({ title: existing ? 'Edit food' : 'Add new food', body, foot });
   setTimeout(() => nameInput.focus(), 50);
+
+  function openOnlineSearch(initialQuery) {
+    const list = el('div', { class: 'food-pick-list' });
+
+    const runSearch = debounce(async (q) => {
+      if (!q.trim()) {
+        list.innerHTML = '';
+        list.append(el('div', { class: 'empty-state' }, 'Type a product name to search Open Food Facts.'));
+        return;
+      }
+      list.innerHTML = '';
+      list.append(el('div', { class: 'muted', style: 'text-align:center;padding:20px 0' }, 'Searching…'));
+      try {
+        const results = await searchFoodProducts(q);
+        list.innerHTML = '';
+        if (results.length === 0) {
+          list.append(el('div', { class: 'empty-state' }, 'No matches. Try a different search, or fill it in manually.'));
+          return;
+        }
+        for (const r of results) {
+          list.append(el('div', {
+            class: 'food-list-item',
+            onclick: () => openFoodForm(null, { prefill: r, notice: 'Auto-filled from Open Food Facts — double-check against the label.' }),
+          }, [
+            el('div', { class: 'f-main' }, [
+              el('div', { class: 'f-name' }, esc(r.name)),
+              el('div', { class: 'f-brand' }, r.brand ? `${r.brand} · per 100g` : 'per 100g'),
+            ]),
+            el('div', { class: 'f-cals' }, `${fmt(r.per100.calories)} kcal`),
+          ]));
+        }
+      } catch (e) {
+        list.innerHTML = '';
+        list.append(el('div', { class: 'empty-state' }, "Couldn't reach Open Food Facts. Check your connection or fill this in manually."));
+      }
+    }, 400);
+
+    const searchInput = el('input', {
+      type: 'text',
+      placeholder: 'Search Open Food Facts…',
+      value: initialQuery,
+      oninput: (e) => runSearch(e.target.value),
+    });
+
+    const body = el('div', {}, [
+      el('div', { class: 'search-box' }, [
+        el('div', { html: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>' }),
+        searchInput,
+      ]),
+      list,
+      el('button', { class: 'btn btn-secondary', style: 'margin-top:10px', onclick: () => openFoodForm(null) }, '← Back to manual entry'),
+    ]);
+
+    openModal({ title: 'Search online', body });
+    runSearch(initialQuery);
+    setTimeout(() => searchInput.focus(), 50);
+  }
 }
