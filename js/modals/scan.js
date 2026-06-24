@@ -66,22 +66,27 @@ export function openBarcodeScanner() {
     startCamera();
 
     async function startCamera() {
+      // Acquire the camera FIRST, while we're still close to the user's tap —
+      // iOS Safari rejects getUserMedia if a network await (the scanner import)
+      // happens before it. Then pick a decoder for the running video.
       try {
-        if ('BarcodeDetector' in window) {
-          await startNative();
-        } else {
-          await startZxing();
-        }
+        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } } });
       } catch (err) {
-        statusEl.textContent = 'Camera unavailable — type the barcode number below instead.';
+        statusEl.textContent = 'Camera blocked — allow camera access, or type the barcode number below.';
+        return;
       }
-    }
-
-    async function startNative() {
-      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } } });
       if (done) { stream.getTracks().forEach((t) => t.stop()); return; }
       video.srcObject = stream;
       await video.play().catch(() => {});
+
+      if ('BarcodeDetector' in window) {
+        startNative();
+      } else {
+        await startZxing();
+      }
+    }
+
+    function startNative() {
       let detector;
       try { detector = new window.BarcodeDetector({ formats: FORMATS }); }
       catch (e) { detector = new window.BarcodeDetector(); }
@@ -98,16 +103,15 @@ export function openBarcodeScanner() {
       try {
         mod = await import(/* @vite-ignore */ ZXING_URL);
       } catch (e) {
-        statusEl.textContent = 'Live scanning needs a connection — type the number below instead.';
+        statusEl.textContent = 'Live scanning needs a connection the first time — type the number below instead.';
         return;
       }
       if (done) return;
       const reader = new mod.BrowserMultiFormatReader();
-      zxingControls = await reader.decodeFromConstraints(
-        { video: { facingMode: { ideal: 'environment' } } },
-        video,
-        (result) => { if (result) finish(result.getText()); },
-      );
+      // Decode from the video element we already attached the camera stream to.
+      zxingControls = await reader.decodeFromVideoElement(video, (result) => {
+        if (result) finish(result.getText());
+      });
       if (done) { try { zxingControls.stop(); } catch (e) { /* ignore */ } return; }
       statusEl.textContent = 'Point the camera at the barcode…';
     }

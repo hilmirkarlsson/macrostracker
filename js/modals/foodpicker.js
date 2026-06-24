@@ -10,41 +10,48 @@ export function openFoodPicker(dateKeyStr, meal) {
 }
 
 function renderSearchStep(dateKeyStr, meal, query) {
-  const foods = state.getFoods()
-    .slice()
-    .sort((a, b) => a.name.localeCompare(b.name))
-    .filter((f) => {
-      if (!query) return true;
-      const q = query.toLowerCase();
-      return f.name.toLowerCase().includes(q) || (f.brand || '').toLowerCase().includes(q);
-    });
-
+  // The search input and modal are built once; only `list` is redrawn as you
+  // type. Rebuilding the whole modal per keystroke would drop focus and
+  // dismiss the on-screen keyboard on mobile.
+  let currentQuery = query || '';
   const list = el('div', { class: 'food-pick-list' });
-  if (foods.length === 0) {
-    list.append(el('div', { class: 'empty-state' }, 'No foods match. Try a different search, or add a new food from the Foods tab.'));
-  } else {
+
+  function drawList() {
+    list.innerHTML = '';
+    const q = currentQuery.trim().toLowerCase();
+    const foods = state.getFoods()
+      .slice()
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .filter((f) => {
+        if (!q) return true;
+        return f.name.toLowerCase().includes(q) || (f.brand || '').toLowerCase().includes(q);
+      });
+
+    if (foods.length === 0) {
+      list.append(el('div', { class: 'empty-state' }, 'No foods match. Try a different search, or add a new food from the Foods tab.'));
+      return;
+    }
     for (const f of foods) {
       const av = foodAvatar(f.name);
-      const row = el('div', { class: 'food-list-item', onclick: () => renderQtyStep(dateKeyStr, meal, f, query) }, [
+      list.append(el('div', { class: 'food-list-item', onclick: () => renderQtyStep(dateKeyStr, meal, f, currentQuery) }, [
         el('div', { class: 'f-avatar', style: `background:color-mix(in srgb, ${av.color} 20%, transparent);color:${av.color}` }, av.letter),
         el('div', { class: 'f-main' }, [
           el('div', { class: 'f-name', html: `${esc(f.name)}${f.estimated ? '<span class="badge-est">est.</span>' : ''}` }),
           el('div', { class: 'f-brand' }, f.brand ? `${f.brand} · ${perUnitLabel(f.unit)}` : perUnitLabel(f.unit)),
         ]),
         el('div', { class: 'f-cals' }, `${fmt(f.per100.calories)} kcal`),
-      ]);
-      list.append(row);
+      ]));
     }
   }
 
   const searchInput = el('input', {
     type: 'text',
     placeholder: 'Search foods…',
-    value: query,
-    oninput: (e) => renderSearchStep(dateKeyStr, meal, e.target.value),
+    value: currentQuery,
+    oninput: (e) => { currentQuery = e.target.value; drawList(); },
   });
 
-  const quickBtn = el('button', { class: 'quick-add-btn', onclick: () => renderQuickStep(dateKeyStr, meal, query) }, [
+  const quickBtn = el('button', { class: 'quick-add-btn', onclick: () => renderQuickStep(dateKeyStr, meal, currentQuery) }, [
     el('div', { html: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>' }),
     el('span', {}, 'Quick add calories'),
   ]);
@@ -58,6 +65,7 @@ function renderSearchStep(dateKeyStr, meal, query) {
     list,
   ]);
 
+  drawList();
   openModal({ title: `Add to ${MEAL_LABELS[meal]}`, body });
   setTimeout(() => searchInput.focus(), 50);
 }
